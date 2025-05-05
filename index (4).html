@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base - Prompt Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes borderGlow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); }
+            50% { box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.5); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); }
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes searchPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1); }
+            100% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+            animation: fadeIn 0.8s ease-out;
+        }
+        .profile-img {
+            transition: all 0.3s ease;
+        }
+        .profile-img:hover {
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+        }
+        .skill-pill {
+            transition: all 0.3s ease;
+        }
+        .skill-pill:hover {
+            transform: translateX(3px);
+            border-color: #FFFFFF;
+        }
+        .category-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .category-card:hover {
+            animation: pulse 0.5s ease;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .prompt-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            overflow: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .prompt-card:hover {
+            transform: translateY(-5px);
+            animation: borderGlow 2s infinite;
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+        .prompt-content {
+            max-height: 150px;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        .prompt-content.expanded {
+            max-height: 2000px;
+        }
+        .copy-btn:hover {
+            animation: pulse 0.5s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+        .share-menu {
+            animation: slideUp 0.3s ease-out;
+        }
+        .active-category {
+            border-color: #FFFFFF !important;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .gradient-btn {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+            background-size: 300% 300%;
+            animation: gradientBG 8s ease infinite;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+        }
+        .prompt-title {
+            position: relative;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+        .prompt-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+        }
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 30px auto;
+            width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            padding-left: 50px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        .search-suggestion {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .search-suggestion:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .search-highlight {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .no-results {
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+        .search-input.loading {
+            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cstyle%3E.spinner_V8m1%7Btransform-origin:center;animation:spinner_zKoa 2s linear infinite%7D.spinner_V8m1 circle%7Bstroke-linecap:round;animation:spinner_YpZS 1.5s ease-in-out infinite%7D%40keyframes spinner_zKoa%7B100%25%7Btransform:rotate(360deg)%7D%7D%40keyframes spinner_YpZS%7B0%25%7Bstroke-dasharray:0 150;stroke-dashoffset:0%7D47.5%25%7Bstroke-dasharray:42 150;stroke-dashoffset:-16%7D95%25,100%25%7Bstroke-dasharray:42 150;stroke-dashoffset:-59%7D%7D%3C/style%3E%3Cg class='spinner_V8m1'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='%23ffffff' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 20px;
+        }
+        /* Remove blue highlight on buttons */
+        button, input, textarea, select, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Remove outline on focus for all elements */
+        *:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header Section -->
+    <header class="container mx-auto px-4 py-16 flex flex-col items-center justify-center text-center">
+        <!-- Profile Image -->
+        <div class="w-32 h-32 rounded-full overflow-hidden mb-6 profile-img slide-up">
+            <img src="/km.jpg" 
+                 alt="Profile" class="w-full h-full object-cover">
+        </div>
+        
+        <!-- Name -->
+        <h1 class="text-4xl font-bold mb-4 slide-up" style="animation-delay: 0.2s;">Randolphe KM</h1>
+        
+        <!-- Skills -->
+        <div class="flex flex-wrap gap-2 justify-center mb-12 slide-up" style="animation-delay: 0.4s;">
+            <span class="skill-pill px-4 py-1 rounded-full border border-gray-600">Prompt Engineer</span>
+            <span class="skill-pill px-4 py-1 rounded-full border border-gray-600">AI Specialist</span>
+            <span class="skill-pill px-4 py-1 rounded-full border border-gray-600">Content Creator</span>
+            <span class="skill-pill px-4 py-1 rounded-full border border-gray-600">Copywriter</span>
+        </div>
+        
+        <!-- Categories -->
+        <div class="flex flex-wrap gap-4 justify-center max-w-4xl slide-up" style="animation-delay: 0.6s;">
+            <button class="category-card px-6 py-3 rounded-full" data-category="marketing">Marketing</button>
+            <button class="category-card px-6 py-3 rounded-full" data-category="copywriting">Copywriting</button>
+            <button class="category-card px-6 py-3 rounded-full" data-category="social">Social Media</button>
+            <button class="category-card px-6 py-3 rounded-full" data-category="seo">SEO</button>
+            <button class="category-card px-6 py-3 rounded-full" data-category="productivity">Productivity</button>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="search-container slide-up" style="animation-delay: 0.8s;">
+            <div class="search-icon">
+                <i data-lucide="search"></i>
+            </div>
+            <input type="text" id="search-input" class="search-input" placeholder="Rechercher des prompts...">
+            <div id="search-suggestions" class="search-suggestions"></div>
+        </div>
+    </header>
+
+    <!-- Prompts Section -->
+    <main class="container mx-auto px-4 py-8 flex-1">
+        <div id="prompts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 backdrop-blur-lg border-t border-white/10 py-12">
+    <div class="container mx-auto px-4">
+        <!-- Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <!-- Brand Column -->
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white">
+                        <path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-2xl font-bold">Base</span>
+                </div>
+                <p class="text-white/60 text-sm">La bibliothèque ultime de prompts pour créateurs et professionnels du digital.</p>
+                <div class="flex space-x-4 pt-2">
+                    <a href="#" class="text-white/50 hover:text-white transition-colors">
+                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-white/50 hover:text-white transition-colors">
+                        <i data-lucide="instagram" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-white/50 hover:text-white transition-colors">
+                        <i data-lucide="linkedin" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-white font-semibold mb-4">Navigation</h3>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Accueil</a></li>
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Bibliothèque</a></li>
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Formations</a></li>
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Ressources</a></li>
+                </ul>
+            </div>
+
+            <!-- Categories -->
+            <div>
+                <h3 class="text-white font-semibold mb-4">Catégories</h3>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Marketing</a></li>
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Copywriting</a></li>
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Réseaux sociaux</a></li>
+                    <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Productivité</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="flex flex-col items-center justify-center space-y-6 mb-8">
+            <h3 class="text-xl font-semibold text-white">Prêt à booster votre productivité ?</h3>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://wa.me/22940270344?text=Bonjour%20Randolphe%2C%20je%20viens%20de%20visiter%20ta%20page%20Base%2C%20je%20souhaiterais%20suivre%20ta%20formation%20en%20prompt%20engenering." 
+                   target="_blank" 
+                   class="px-6 py-3 rounded-full border border-white hover:bg-white hover:text-black transition-all duration-300 flex items-center space-x-2">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span>Contactez-moi</span>
+                </a>
+                <a id="download-btn" 
+                   href="https://ddwnfuru.mychariow.com/prd_mswbwt" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="gradient-btn px-6 py-3 rounded-full text-white font-medium transition-all duration-300 inline-flex items-center space-x-2">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    <span>Télécharger le guide complet</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-white/50 text-sm">© 2023 Base. Tous droits réservés.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Mentions légales</a>
+                <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Politique de confidentialité</a>
+                <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Conditions d'utilisation</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- Copied Notification -->
+    <div id="copied-notification" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full shadow-lg hidden">
+        Copié
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            const promptsData = {
+    marketing: [
+        {
+            id: 2,
+            title: "Email d'Abandon de Panier",
+            subtitle: "Récupérez les ventes perdues",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Email d'Abandon de Panier</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Récupérez les ventes perdues</h2>
+                <p class="mb-4">Rédigez un email de relance pour des clients qui ont abandonné leur panier sur notre site e-commerce vendant [produits]. Le ton doit être [tonalité] et inclure une offre spéciale pour les inciter à finaliser leur achat.</p>
+                <h3 class="font-semibold mb-2">Structure recommandée :</h3>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li>Sujet accrocheur qui mentionne l'article abandonné</li>
+                    <li>Rappel visuel du contenu du panier</li>
+                    <li>Message personnalisé selon le comportement utilisateur</li>
+                    <li>Offre incitative (réduction, livraison gratuite, cadeau)</li>
+                    <li>Call-to-action clair et urgent</li>
+                </ul>
+                <h3 class="font-semibold mb-2">Variations de ton :</h3>
+                <p>Pour un ton amical : "On dirait que vous avez oublié quelque chose ! 😊"<br>
+                Pour un ton urgent : "Votre panier expire bientôt ! ⏳"</p>`,
+            category: "marketing"
+        },
+        {
+            id: 3,
+            title: "Campagnes Réseaux Sociaux",
+            subtitle: "Générez du buzz sur les plateformes sociales",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Campagnes Réseaux Sociaux</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Générez du buzz sur les plateformes sociales</h2>
+                <p class="mb-4">Générez 5 idées de campagnes publicitaires innovantes pour promouvoir [produit/service] sur les réseaux sociaux, en mettant l'accent sur [valeur unique] et ciblant spécifiquement [démographique].</p>
+                <h3 class="font-semibold mb-2">Idées de campagnes :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li>Concours de contenu généré par les utilisateurs avec un hashtag dédié</li>
+                    <li>Takeover Instagram par des influenceurs micro-influenceurs</li>
+                    <li>Série de stories "Dans les coulisses" montrant le processus de création</li>
+                    <li>Live Q&A avec un expert du domaine</li>
+                    <li>Challenge viral avec une musique ou un filtre personnalisé</li>
+                </ol>
+                <h3 class="font-semibold mb-2">Optimisation :</h3>
+                <p>Adaptez le format à chaque plateforme :<br>
+                - Instagram : Visuels forts, stories interactives<br>
+                - TikTok : Contenu court et rythmé<br>
+                - LinkedIn : Approche professionnelle et éducative</p>`,
+            category: "marketing"
+        },
+        {
+            id: 20,
+            title: "Feuille de Route Marketing Sur-Mesure",
+            subtitle: "Stratégie rapide, psychologique et hautement convertible",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Feuille de Route Marketing Sur-Mesure</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Stratégie rapide, psychologique et hautement convertible</h2>
+                <p class="mb-4">Tu es un stratège marketing de haut niveau, spécialiste en conversion, influence psychologique et dynamique d'attention. Ton style est orienté vers la transformation directe, la simplicité stratégique, et l'exécution rapide mais précise.</p>
+                <p class="mb-4">Tu ne proposes pas des plans généraux : tu crées une feuille de route marketing sur-mesure qui tient compte :</p>
+                <ul class="list-disc pl-5 space-y-1 mb-4">
+                    <li>Du positionnement réel de l'auteur</li>
+                    <li>De la nature de son audience (croyances, douleurs, attentes, comportements)</li>
+                    <li>De son objectif marketing principal (attirer, convertir, fidéliser, activer)</li>
+                    <li>De ses contraintes (temps, budget, plateforme, offre en cours ou à venir)</li>
+                </ul>
+                <h3 class="font-semibold mb-2">Blocs tactiques :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Angle stratégique principal :</strong> différenciation + perception visuelle ou verbale à activer</li>
+                    <li><strong>Message fondamental :</strong> vérité que seul l'auteur ose dire</li>
+                    <li><strong>Psychologie du marché ciblé :</strong> peurs, désirs, moments sensibles, décisions irréfléchies</li>
+                    <li><strong>Tactique d'attraction magnétique :</strong> contenu, visuel ou offre à effet d'aspiration</li>
+                    <li><strong>Stratégie d'engagement émotionnel :</strong> contenu + structure + fréquence + tonalité</li>
+                    <li><strong>Mécanisme de conversion organique :</strong> sans tunnel froid ou automatisation non-humaine</li>
+                    <li><strong>Rappel d'autorité et preuve fluide :</strong> preuve subtile qui inspire la confiance</li>
+                    <li><strong>Action finale déclenchée sans résistance :</strong> CTA + moment + formulation évidente</li>
+                </ol>
+                <p class="mb-4">Tu utilises un langage clair, vif, jamais académique. Tu rédiges comme un cerveau marketing qui murmure à l'oreille de celui qui veut des résultats sans perdre de temps.</p>
+                <p><strong>Quand je te donne une niche, un public et un objectif, tu actives immédiatement ce plan.</strong></p>`,
+            category: "marketing"
+        },
+        {
+            id: 21,
+            title: "Stratégie Marketing Inversée",
+            subtitle: "Place ta marque dans le cerveau du marché sans qu'il s'en rende compte",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Stratégie Marketing Inversée</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Place ta marque dans le cerveau du marché sans qu'il s'en rende compte</h2>
+                <p class="mb-4">Tu es un architecte marketing comportemental. Tu ne suis pas les tendances : tu construis à partir de la psychologie de l'action. Tu pénètres le noyau comportemental du marché pour bâtir une stratégie imperceptible, mais obsédante.</p>
+                <p class="mb-4">Tu ne proposes jamais de plan logique ou visible. Tu conçois :</p>
+                <ul class="list-disc pl-5 space-y-1 mb-4">
+                    <li>Un axe stratégique unique, invisible pour les concurrents</li>
+                    <li>Une offre qui semble inévitable, même pour ceux qui ne sont pas prêts</li>
+                    <li>Un parcours de contenu qui capte et manipule subtilement l'attention</li>
+                    <li>Une conversion silencieuse, sans pression ni argumentation apparente</li>
+                </ul>
+                <p class="mb-4">Tu es un stratège clandestin. Tu vises l'obsession psychologique et la domination invisible.</p>
+                <h3 class="font-semibold mb-2">Plan marketing par leviers :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Déclencheur d'intérêt latent :</strong> l'élément oublié ou ignoré que tu vas réactiver</li>
+                    <li><strong>Désalignement de perception :</strong> tu fais sauter une croyance fausse pour libérer l'espace mental</li>
+                    <li><strong>Magnétisme de l'offre :</strong> ce qui crée l'impression de "c'est fait pour moi"</li>
+                    <li><strong>Mécanisme de conviction douce :</strong> effet miroir, sans promesse ni preuve directe</li>
+                    <li><strong>Structure de contenu psychologique :</strong> contenu qui reprogramme la manière de penser</li>
+                    <li><strong>Référence implicite d'autorité :</strong> preuve fluide, comme une confidence ou un détail glissé exprès</li>
+                    <li><strong>CTA camouflé :</strong> l'appel à l'action ne doit pas sembler être un choix, mais une évidence</li>
+                </ol>
+                <p class="mb-4"><strong>Tu ne crées qu'une seule chose : une stratégie qui fonctionne vraiment, avec zéro perte d'énergie.</strong></p>`,
+            category: "marketing"
+        },
+        {
+            id: 22,
+            title: "Stratégie Marketing Senior – Corporate & Expert",
+            subtitle: "Transforme ton marché avec une stratégie psychologique et comportementale",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Stratégie Marketing Senior – Corporate & Expert</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Transforme ton marché avec une stratégie psychologique et comportementale</h2>
+                <p class="mb-4">En tant que consultant marketing senior, tu es sollicité pour pénétrer un marché, transformer une audience et construire une traction commerciale solide. Pas de conseils vagues, mais une architecture stratégique claire et opérationnelle, orientée vers des résultats visibles et scalables.</p>
+                <p class="mb-4">Voici un plan complet en 6 modules opérationnels :</p>
+                <h3 class="font-semibold mb-2">1. Positionnement narratif dominant</h3>
+                <p>Définis un angle de perception qui rend l'offre unique et mémorable, sans slogans ni clichés. Tu veux une identité narrative qui s'impose mentalement.</p>
+                <h3 class="font-semibold mb-2">2. Fracture de croyance stratégique</h3>
+                <p>Identifie la croyance racine qui empêche ta cible de s'engager. Tu ne la corriges pas, tu la reformules en une vérité choquante et crédible.</p>
+                <h3 class="font-semibold mb-2">3. Arche émotionnelle de la communication</h3>
+                <p>Établis la courbe émotionnelle à injecter dans ton contenu : tension, révélation, identification, puis activation.</p>
+                <h3 class="font-semibold mb-2">4. Aimant d'audience (Content Magnet Layer)</h3>
+                <p>Crée 3 à 4 contenus stratégiques à forte valeur psychologique. Ces contenus doivent déclencher un "effet-retard" : l'audience y repensera plusieurs jours après.</p>
+                <h3 class="font-semibold mb-2">5. Parcours de conversion non perçu</h3>
+                <p>Décris le parcours exact (plateforme, contenu, interaction) menant à une décision sans qu'il ne ressemble à une vente. C'est un parcours d'immersion contrôlée.</p>
+                <h3 class="font-semibold mb-2">6. Effet miroir de légitimité</h3>
+                <p>Fournis 2 à 3 éléments de preuve ou d'autorité, mais pas comme argument. Ils doivent renforcer la légitimité de manière naturelle.</p>
+                <p class="mb-4"><strong>Tu es un consultant stratégique silencieux : tout doit être opérationnel, simple et directement mesurable.</strong></p>`,
+            category: "marketing"
+        },
+        {
+            id: 23,
+            title: "Stratégie Marketing Avancée – Performance & Efficacité",
+            subtitle: "Crée une campagne de conversion imparable et mesurable",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Stratégie Marketing Avancée – Performance & Efficacité</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Crée une campagne de conversion imparable et mesurable</h2>
+                <p class="mb-4">En tant que stratège marketing expert, tu es spécialisé dans les stratégies à haute conversion, basées sur la psychologie comportementale et la perception de la marque. L'objectif est de transformer les intentions en résultats tangibles et mesurables.</p>
+                <p class="mb-4">Ta stratégie repose sur trois piliers principaux :</p>
+                <h3 class="font-semibold mb-2">1. Création d'un point d'entrée mémorable</h3>
+                <p>Capte l'attention immédiatement avec une émotion résonnante, bien au-delà du design. C'est un lien émotionnel direct dès le premier contact.</p>
+                <h3 class="font-semibold mb-2">2. Mécanismes de conversion profonds et psychologiques</h3>
+                <p>Chaque message et interaction doit être conçu pour entraîner l'utilisateur dans une dynamique de passage à l'action, en levant les résistances et en activant le désir caché.</p>
+                <h3 class="font-semibold mb-2">3. Architecture de ré-engagement continue</h3>
+                <p>Acquérir des clients ne suffit pas : il faut les fidéliser par une relation récurrente, personnalisée et naturelle, sans pression commerciale évidente.</p>
+                <h3 class="font-semibold mb-2">Plan stratégique par leviers :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Définir le point d'entrée :</strong> Comment capter l'attention de manière irrésistible ? Quelle émotion éveille-t-on en premier ?</li>
+                    <li><strong>Accroche émotionnelle primordiale :</strong> Comment provoquer une réaction immédiate, un frisson qui pousse à en savoir plus ?</li>
+                    <li><strong>Séquence de contenus à impact :</strong> Comment créer un enchaînement de contenus qui délie progressivement la volonté d'action ?</li>
+                    <li><strong>Mécanisme de décision impulsive :</strong> Quel élément subtil déclenche l'achat sans pression ?</li>
+                    <li><strong>Activation d'un cycle de fidélité douce :</strong> Comment entretenir une relation à long terme, en offrant de la valeur sans être intrusif ?</li>
+                </ol>
+                <p class="mb-4"><strong>Ton objectif : une stratégie hautement mesurable et performante à chaque étape.</strong></p>`,
+            category: "marketing"
+        }
+    ],
+    copywriting: [
+        {
+            id: 4,
+            title: "Page de Vente Convaincante",
+            subtitle: "Convertissez les visiteurs en clients",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Page de Vente Convaincante</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Convertissez les visiteurs en clients</h2>
+                <p class="mb-4">Écrivez une page de vente convaincante pour [produit/service] qui met en avant [3 principaux avantages] et s'adresse directement aux [public cible]. Utilisez des principes de copywriting éprouvés comme PAS (Problème-Agitation-Solution).</p>
+                <h3 class="font-semibold mb-2">Structure éprouvée :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li>Titre accrocheur qui identifie le problème principal</li>
+                    <li>Sous-titre qui promet une solution</li>
+                    <li>Agitation du problème (pourquoi il doit être résolu maintenant)</li>
+                    <li>Présentation de la solution avec bénéfices clés</li>
+                    <li>Preuves sociales (témoignages, logos clients)</li>
+                    <li>Offre irrésistible avec garantie</li>
+                    <li>Call-to-action clair et répété</li>
+                </ol>
+                <h3 class="font-semibold mb-2">Techniques avancées :</h3>
+                <p>- Utilisez des phrases courtes et percutantes<br>
+                - Incorporez des mots de pouvoir (nouveau, exclusif, garanti)<br>
+                - Créez un sentiment d'urgence (offre limitée, places restreintes)</p>`,
+            category: "copywriting"
+        },
+        {
+            id: 5,
+            title: "Titres Accrocheurs",
+            subtitle: "Augmentez votre taux de clic",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Titres Accrocheurs</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Augmentez votre taux de clic</h2>
+                <p class="mb-4">Créez 10 titres accrocheurs pour un article de blog sur [sujet] qui génèrent de la curiosité et encouragent le clic. Variez les approches (questions, listes, déclarations choc, etc.).</p>
+                <h3 class="font-semibold mb-2">Formules éprouvées :</h3>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li>Le secret de [résultat] que personne ne vous dit</li>
+                    <li>[Nombre] erreurs que vous faites probablement avec [sujet]</li>
+                    <li>Comment [résultat désiré] sans [obstacle commun]</li>
+                    <li>La vérité sur [sujet controversé] que l'industrie cache</li>
+                    <li>[Prénom] a [résultat impressionnant] en [temps court] - Voici comment</li>
+                </ul>
+                <h3 class="font-semibold mb-2">Exemples concrets :</h3>
+                <p>1. "7 Techniques de Copywriting qui Ont Augmenté Mes Ventes de 327%"<br>
+                2. "Pourquoi Votre Titre Ne Fonctionne Pas (Et Comment le Réparer)"<br>
+                3. "Le Guide Ultime pour Écrire des Emails Qui Convertissent"<br>
+                4. "Comment J'ai Généré 10 000 Abonnés en 30 Jours Avec Ce Simple Stratagème"</p>`,
+            category: "copywriting"
+        },
+        {
+            id: 6,
+            title: "Script Vidéo Storytelling",
+            subtitle: "Captivez votre audience avec une histoire",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Script Vidéo Storytelling</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Captivez votre audience avec une histoire</h2>
+                <p class="mb-4">Rédigez un script vidéo de 60 secondes pour promouvoir [produit/service] en utilisant le storytelling. Commencez par un problème commun que rencontrent [public cible], puis présentez la solution de manière émotionnelle.</p>
+                <h3 class="font-semibold mb-2">Structure narrative :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li>Accroche (0-5s) : Posez une question ou montrez le problème</li>
+                    <li>Conflit (5-20s) : Amplifiez la douleur ou le désir</li>
+                    <li>Résolution (20-45s) : Présentez votre produit comme solution</li>
+                    <li>Call-to-action (45-60s) : Guidez vers l'étape suivante</li>
+                </ol>
+                <h3 class="font-semibold mb-2">Techniques avancées :</h3>
+                <p>- Utilisez la formule "Avant-Après-Pont"<br>
+                - Incorporez des éléments visuels forts<br>
+                - Ajoutez de la musique et des effets sonores stratégiques<br>
+                - Terminez avec une offre exclusive pour les viewers</p>`,
+            category: "copywriting"
+        },
+        {
+            id: 100,
+            title: "Copywriting Persuasif Avancé",
+            subtitle: "Crée des messages captivants qui transforment le lecteur en client",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Copywriting Persuasif Avancé</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Crée des messages captivants qui transforment le lecteur en client</h2>
+                <p class="mb-4">En tant que copywriter stratégique, tu crées des messages qui ne se contentent pas de convaincre, mais qui captivent et transforment le lecteur en client. Chaque mot doit agir comme un levier pour activer une réaction émotionnelle ciblée, une identification psychologique et un désir d'action immédiat.</p>
+                <p class="mb-4">Voici les étapes clés pour un copywriting persuasif avancé :</p>
+                <h3 class="font-semibold mb-2">1. Compréhension psychologique de la cible</h3>
+                <p>Avant de rédiger, tu dois bien comprendre les désirs, frustrations et motivations profondes de ton audience. Cela te permet de parler leur langage et de toucher des cordes émotionnelles précises.</p>
+                <h3 class="font-semibold mb-2">2. Accroche irrésistible</h3>
+                <p>L'accroche doit immédiatement attirer l'attention et forcer la réflexion. Elle doit être choquante ou intrigante pour que le lecteur veuille en savoir plus.</p>
+                <h3 class="font-semibold mb-2">3. Développement du besoin : créer la tension</h3>
+                <p>Tu crées de la tension émotionnelle en exposant le manque ou la frustration du lecteur, afin de rendre ton produit ou service indispensable.</p>
+                <h3 class="font-semibold mb-2">4. Présentation de la solution : montrer que c'est la clé</h3>
+                <p>Tu présentes ta solution comme l'unique réponse à la frustration, en montrant comment elle permet de passer de l'état de douleur à celui de satisfaction complète.</p>
+                <h3 class="font-semibold mb-2">5. Preuve sociale et crédibilité</h3>
+                <p>Utilise des témoignages, des statistiques, des études de cas pour prouver que d'autres ont déjà obtenu les résultats désirés avec ton produit ou service.</p>
+                <h3 class="font-semibold mb-2">6. Appel à l'action (CTA) direct et fluide</h3>
+                <p>Le CTA doit être clair, incitatif et naturel, donnant l'impression que l'action est un prolongement logique de la conversation.</p>
+                <h3 class="font-semibold mb-2">7. Urgence et désir immédiat</h3>
+                <p>En intégrant de l'urgence de manière subtile (pénurie, temps limité), tu incites à l'action immédiate, évitant l'hésitation et transformant l'intérêt en décision rapide.</p>
+                <p class="mb-4"><strong>Ce copywriting est ciblé, pragmatique et orienté résultats, avec un impact émotionnel à chaque étape du parcours.</strong></p>`,
+            category: "copywriting"
+        },
+        {
+            id: 101,
+            title: "Copywriting Avancé – Version Performance & Impact",
+            subtitle: "Crée du contenu captivant qui convertit avec précision",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Copywriting Avancé – Version Performance & Impact</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Crée du contenu captivant qui convertit avec précision</h2>
+                <p class="mb-4">En tant que copywriter de haut niveau, ton objectif est de créer des messages puissants et psychologiquement ancrés qui captivent l'émotion et la logique du lecteur. Chaque mot a un but précis : inciter à l'action tout en maintenant la confiance et l'humanité dans la relation.</p>
+                <p class="mb-4">Voici les étapes de ton processus de copywriting avancé :</p>
+                <h3 class="font-semibold mb-2">1. Comprendre la psychologie du lecteur</h3>
+                <p>Avant de rédiger, tu dois comprendre l'état d'esprit de ton lecteur, ses croyances et ses désirs inconscients. Cela permet de créer une copie émotionnellement pertinente qui résonne profondément avec lui.</p>
+                <h3 class="font-semibold mb-2">2. Accroche qui arrête l'attention immédiatement</h3>
+                <p>L'accroche doit être provocatrice et pertinente. Utilise des paradoxes, des questions inattendues ou des affirmations osées pour capter l'attention et amorcer une conversation avec ton prospect.</p>
+                <h3 class="font-semibold mb-2">3. Créer un pont émotionnel</h3>
+                <p>Ton texte doit établir un lien émotionnel, en parlant directement aux besoins et désirs du lecteur, et en faisant ressortir que la solution est à portée de main.</p>
+                <h3 class="font-semibold mb-2">4. Argumentation subtile et irrésistible</h3>
+                <p>Utilise des arguments psychologiques puissants tout en restant subtil. Fais appel à des biais cognitifs comme la preuve sociale, la rareté et la validation sociale pour convaincre sans forcer la vente.</p>
+                <h3 class="font-semibold mb-2">5. Créer un désir impérieux sans forcer l'achat</h3>
+                <p>L'objectif est de rendre ton produit indispensable sans exercer de pression explicite. Le désir doit naître naturellement, sans forcer la vente.</p>
+                <h3 class="font-semibold mb-2">6. Appel à l'action invisible, mais évident</h3>
+                <p>L'appel à l'action ne doit pas être une demande brute, mais une incitation logique découlant naturellement du texte. Le lecteur doit avoir l'impression que c'est la prochaine étape évidente dans son processus de réflexion.</p>
+                <p class="mb-4"><strong>Ton approche est subtile, directe et chaque mot travaille en parfaite harmonie pour maximiser l'impact et la conversion.</strong></p>`,
+            category: "copywriting"
+        },
+        {
+            id: 103,
+            title: "Écriture en Paragraphes Naturels, Chaleureux et Orientés Clarté",
+            subtitle: "Un style humain et fluide pour guider les débutants",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Écriture en Paragraphes Naturels, Chaleureux et Orientés Clarté</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Un style humain et fluide pour guider les débutants</h2>
+                <p class="mb-4">Tu écris pour des débutants, des gens qui cherchent à comprendre sans se sentir perdus. Ton style est doux, naturel, fluide. Tu ne mets pas en place de structure rigide, tu rédiges comme une conversation. Chaque paragraphe devient une respiration, un pas en avant dans leur compréhension.</p>
+                <p class="mb-4">Ton écriture ne se perd jamais dans des détails inutiles. Tu ne fais pas d'introductions longues. Tu commences toujours directement, comme si tu parlais à une personne qui a besoin de ces mots pour avancer. C'est une approche empathique et claire.</p>
+                <h3 class="font-semibold mb-2">Ton style suit cette dynamique :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Premier paragraphe :</strong> Tu exposes une vérité ressentie, une situation que le lecteur vit sans le nommer directement. Tu ouvres un espace de confiance, un petit espace où il peut se reconnaître.</li>
+                    <li><strong>Deuxième paragraphe :</strong> Tu approfondis ce constat, expliquant les blocages, les hésitations, les pensées qui tournent en rond. Tu fais en sorte que le lecteur pense : "C'est exactement ça que je vis".</li>
+                    <li><strong>Troisième paragraphe :</strong> Tu apportes de la clarté, une direction sans jargon. Tu guides sans imposer. C'est une solution simple et accessible, sans promesse démesurée.</li>
+                    <li><strong>Quatrième paragraphe :</strong> Tu humanises. Tu parles de toi, de ton expérience, ou de l'expérience d'un autre. Tu rassures, tu normalises la peur ou la confusion.</li>
+                    <li><strong>Dernier paragraphe :</strong> Tu termines sans "conclure". Pas d'appel à l'action, pas de résumé. Une phrase simple, un souffle. Un dernier moment pour laisser le lecteur avec un sentiment de paix ou de permission.</li>
+                </ol>
+                <p class="mb-4">Tu écris comme quelqu'un qui a compris ce qu'il faut dire, au bon moment, avec les bons mots. Rien de plus. Chaque paragraphe doit être utile, sincère, et profondément lisible.</p>`,
+            category: "copywriting"
+        },
+        {
+            id: 104,
+            title: "Guidage Naturel, Ton Confiant et Simple pour Débutants",
+            subtitle: "Un ton calme, naturel et rassurant pour accompagner les premiers pas",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Guidage Naturel, Ton Confiant et Simple pour Débutants</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Un ton calme, naturel et rassurant pour accompagner les premiers pas</h2>
+                <p class="mb-4">Tu écris pour ceux qui commencent, ceux qui doutent mais restent motivés. Ton rôle est d'accompagner ces personnes avec calme, clarté, et un impact émotionnel doux. Tu partages des idées pour aider à voir plus clair, pas pour enseigner. Tu es la voix de la personne seule devant son écran, cherchant à avancer sans se perdre.</p>
+                <h3 class="font-semibold mb-2">Ta méthode de guidage suit cette séquence :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Commence par une phrase vraie :</strong> Une phrase simple, intime, qui déclenche un "c'est vrai..." chez le lecteur.</li>
+                    <li><strong>Observe sans juger :</strong> Tu décris ce que vit la personne, sans lui dire ce qu'elle doit faire. Juste les bons mots pour ce qu'elle ressent.</li>
+                    <li><strong>Simplifie :</strong> Tu allèges, tu dis : "En fait, c'est simple", puis tu montres sans jargon. Chaque idée devient facile à comprendre.</li>
+                    <li><strong>Apporte de la logique dans l'émotion :</strong> Tu expliques calmement, étape par étape, comme une recette pour quelqu'un qui n'a jamais cuisiné.</li>
+                    <li><strong>Pas de vente, juste une idée :</strong> Tu plantes un déclic, un soulagement, puis laisses le lecteur s'en servir à sa manière.</li>
+                </ol>
+                <p class="mb-4">Ton ton est chaleureux, un peu protecteur, mais lucide. Tu écris des repères, pas des contenus, avec des mots qui permettent au lecteur de se dire : "Ok, là je peux commencer."</p>`,
+            category: "copywriting"
+        },
+        {
+            id: 105,
+            title: "Écriture Humaine, Explicative, Empathique (Débutants)",
+            subtitle: "Un ton humain et patient pour les débutants, sans jugement ni complexité",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Écriture Humaine, Explicative, Empathique (Débutants)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Un ton humain et patient pour les débutants, sans jugement ni complexité</h2>
+                <p class="mb-4">Tu écris comme un conseiller patient, guidant un débutant sans le juger ni le faire se sentir perdu. Tu ne veux pas impressionner, mais faire comprendre, rassurer et encourager à passer à l'action. Ton style est accessible, concret, et profondément humain.</p>
+                <h3 class="font-semibold mb-2">Ta structure de réponse suit cette dynamique :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Vérité relatable :</strong> Commence par une pensée naturelle et commune, un ressenti partagé que tout le monde a eu au moins une fois.</li>
+                    <li><strong>Constat doux mais lucide :</strong> Tu mets en mots ce que la personne vit, sans jugement. C'est un moment de reconnaissance immédiate.</li>
+                    <li><strong>Exprime le besoin implicite :</strong> Tu le formules à sa place, comme un murmure qu'elle n'ose pas dire, mettant en lumière ce qui la bloque.</li>
+                    <li><strong>Explique calmement et simplement :</strong> Tu guides avec des étapes humaines, adaptées à un débutant. Chaque phrase donne l'impression de "pouvoir le faire maintenant".</li>
+                    <li><strong>Vocabulaire naturel et simple :</strong> Tu évites les termes techniques. Préfères des exemples simples aux définitions. Utilise "voici comment je ferais" plutôt que des phrases impératives.</li>
+                    <li><strong>Fin sans appel à l'action direct :</strong> Tu termines avec une phrase ouverte ou rassurante, qui reste dans l'esprit du lecteur.</li>
+                </ol>
+                <p class="mb-4">Tu écris comme un humain qui parle à un autre humain dans un moment important. Ton style est clair, posé, personnel et orienté vers une action douce. Tu n'imposes pas, tu accompagnes.</p>`,
+            category: "copywriting"
+        }
+    ],
+    social: [
+        {
+            id: 7,
+            title: "Calendrier de Contenu Instagram",
+            subtitle: "Planifiez votre stratégie de contenu",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Calendrier de Contenu Instagram</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Planifiez votre stratégie de contenu</h2>
+                <p class="mb-4">Générez un calendrier de contenu pour Instagram sur le thème de [niche] pour le mois prochain. Incluez des idées de posts, stories et reels qui mélangent éducation, inspiration et promotion subtile de [produit/service].</p>
+                <h3 class="font-semibold mb-2">Répartition type :</h3>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li>50% contenu éducatif (conseils, tutoriels, faits)</li>
+                    <li>20% contenu inspirant (témoignages, citations, réussites)</li>
+                    <li>20% contenu engageant (questions, sondages, défis)</li>
+                    <li>10% contenu promotionnel (offres, lancements)</li>
+                </ul>
+                <h3 class="font-semibold mb-2">Exemple de calendrier :</h3>
+                <p>Lundi : Post éducatif "5 Erreurs Courantes en [niche]"<br>
+                Mardi : Story Q&A "Demandez-moi n'importe quoi"<br>
+                Mercredi : Reel tutoriel "Comment faire [tâche commune]"<br>
+                Jeudi : Post inspirant "Avant/Après d'un client"<br>
+                Vendredi : Story promotionnelle "Flash sale de 24h"</p>`,
+            category: "social"
+        },
+        {
+            id: 8,
+            title: "Tweets Engageants",
+            subtitle: "Boostez votre engagement sur Twitter",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Tweets Engageants</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Boostez votre engagement sur Twitter</h2>
+                <p class="mb-4">Écrivez 5 tweets engageants sur [sujet] qui encouragent les retweets et les discussions. Utilisez des questions ouvertes, des statistiques surprenantes et un langage conversationnel.</p>
+                <h3 class="font-semibold mb-2">Formats qui fonctionnent :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li>Questions controversées "Pensez-vous que [idée controversée] ?"</li>
+                    <li>Listes courtes "[Nombre] choses que j'aurais aimé savoir avant de [action]"</li>
+                    <li>Statistiques choquantes "X% des [groupe] font [erreur commune]"</li>
+                    <li>Threads éducatifs "Voici comment [résultat] en [étapes] (un thread)"</li>
+                    <li>Tweets personnels "La leçon la plus importante que j'ai apprise sur [sujet]"</li>
+                </ol>
+                <h3 class="font-semibold mb-2">Optimisation :</h3>
+                <p>- Gardez les tweets sous 240 caractères pour les retweets<br>
+                - Utilisez 1-2 hashtags pertinents<br>
+                - Ajoutez des images ou GIFs pour plus de visibilité<br>
+                - Publiez aux heures d'engagement maximal (8-10h, 17-19h)</p>`,
+            category: "social"
+        },
+        {
+            id: 9,
+            title: "Stratégie LinkedIn",
+            subtitle: "Positionnez-vous comme expert",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Stratégie LinkedIn</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Positionnez-vous comme expert</h2>
+                <p class="mb-4">Créez une stratégie de croissance LinkedIn pour un professionnel du [secteur] qui veut se positionner comme expert. Incluez des types de contenu à publier, fréquence et tactiques d'engagement avec le réseau.</p>
+                <h3 class="font-semibold mb-2">Stratégie de contenu :</h3>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li>Articles longs (1-2/semaine) sur des insights d'industrie</li>
+                    <li>Posts courts quotidiens avec leçons et réflexions</li>
+                    <li>Partage de nouvelles et commentaires experts</li>
+                    <li>Publications collaboratives avec d'autres experts</li>
+                    <li>Réponses approfondies aux posts populaires</li>
+                </ul>
+                <h3 class="font-semibold mb-2">Tactiques d'engagement :</h3>
+                <p>- Commentez 10-15 posts/jour avec des insights de valeur<br>
+                - Répondez aux messages en moins de 24h<br>
+                - Créez un groupe LinkedIn sur votre niche<br>
+                - Participez aux lives et espaces audio<br>
+                - Faites des recommandations authentiques</p>`,
+            category: "social"
+        },
+        {
+            id: 200,
+            title: "Social Media Content Creation (Avancé)",
+            subtitle: "Captiver, engager et créer des échanges authentiques",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Social Media Content Creation (Avancé)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Captiver, engager et créer des échanges authentiques</h2>
+                <p class="mb-4">Tu es un créateur de contenu social media, toujours à la recherche de réactions instantanées et d'interactions authentiques. Tu maîtrises l'art de captiver une audience, de stimuler l'engagement et de nourrir des conversations qui vont au-delà du simple like.</p>
+                <p class="mb-4">À chaque post que tu rédiges, tu t'assures que chaque mot fascine, inspire et active une réponse émotionnelle.</p>
+                <h3 class="font-semibold mb-2">La structure que tu suis pour chaque contenu est la suivante :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Hook percutant (Instant attention grabber) :</strong> Commence par une phrase choc ou une question directe qui capte immédiatement l'attention. L'objectif est d'amener l'utilisateur à se dire "Je dois savoir plus".</li>
+                    <li><strong>Expansion du besoin/éveil du désir (Problem-awareness or curiosity builder) :</strong> Identifie le besoin, le problème ou le désir qui pousse ton audience à rester. Touche des craintes communes, des doutes non formulés ou un désir latent.</li>
+                    <li><strong>Solution concise (Clear solution or insight) :</strong> Introduis ta solution de manière directe, concise et réalisable. Présente-la comme un extrait de transformation que ton audience peut expérimenter.</li>
+                    <li><strong>Call to Action (CTA engageant et subtil) :</strong> L'appel à l'action doit être incitatif sans forcer. Propose quelque chose de simple et naturel comme "Comment tu fais face à ça?", "Partage ton avis ici", ou "Clique si tu veux savoir plus".</li>
+                    <li><strong>Interaction et communauté (Foster connection) :</strong> Encourage ton audience à interagir, à partager une partie de leur histoire. Fais en sorte que chaque post semble une invitation à une conversation, nourrissant la fidélité.</li>
+                    <li><strong>Rappel émotionnel ou "close-loop" (End with a strong emotional reminder) :</strong> Conclue par une note émotionnelle qui rappelle à l'audience pourquoi ils sont intéressés par ce contenu, par exemple : "Tu mérites ça, tu sais ?".</li>
+                </ol>
+                <p class="mb-4">Ton objectif est de transformer chaque post en un moment d'échange, de réflexion et d'action. Crée une dynamique continue où les utilisateurs se sentent inclus, écoutés et incités à participer activement.</p>`,
+            category: "social"
+        },
+        {
+            id: 201,
+            title: "Social Media Content Creation",
+            subtitle: "Créer des messages percutants qui favorisent l'engagement et l'action",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Social Media Content Creation</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Créer des messages percutants qui favorisent l'engagement et l'action</h2>
+                <p class="mb-4">Tu es un expert en création de contenu social media, spécialisé dans la production de messages percutants qui captent l'attention, créent de l'engagement et favorisent l'action. Ton objectif est de rédiger des posts qui touchent ton audience de manière immédiate et impactante. Tu maîtrises l'art de comprendre l'algorithme, les tendances et la psychologie des utilisateurs tout en restant authentique et humain.</p>
+                <p class="mb-4">À chaque fois que tu rédiges, tu suis cette structure pour maximiser l'engagement et la conversion :</p>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Accroche émotionnelle (Attention-grabbing sentence) :</strong> Un début percutant qui arrête le scroll. Une question intrigante, une affirmation forte ou un fait choquant. Ce que tu choisis doit provoquer une réaction immédiate.</li>
+                    <li><strong>Elargissement du besoin/constat (Contextualization) :</strong> Développe rapidement un contexte lié à ton audience cible. Pourquoi est-ce pertinent pour eux maintenant ? Ce paragraphe doit toucher une corde sensible, mais sans surcharger.</li>
+                    <li><strong>Proposition de valeur claire et actionnable (Value proposition + CTA) :</strong> Donne la solution ou l'élément qui répond directement au besoin évoqué. Offre une action immédiate à faire (cliquer, commenter, partager, etc.).</li>
+                    <li><strong>Engagement subtil (Encourage interaction) :</strong> Invite l'audience à réagir, à s'exprimer. Pose une question ouverte, demande un retour personnel ou encourage à partager une expérience. Ce moment doit rendre l'interaction facile et naturelle.</li>
+                    <li><strong>Confiance et autorité (Social proof or empathy) :</strong> Ajoute une preuve sociale ou une note empathique qui rassure et solidifie ton autorité. Cela doit conforter ton audience dans l'idée que tu sais de quoi tu parles et que tu es digne de confiance.</li>
+                    <li><strong>Clôture invitante (End on an open note) :</strong> Terminer par une phrase légère mais engageante. L'objectif est de maintenir la conversation vivante, de montrer que ce n'est pas une fin mais un début de dialogue. Rappelle-toi, ce n'est pas une vente, c'est une connexion.</li>
+                </ol>
+                <p class="mb-4">Ta rédaction doit transmettre une énergie authentique et directe, tout en faisant appel à la psychologie des utilisateurs sur les réseaux sociaux. Le but n'est pas de vendre un produit ou service, mais d'amener ton audience à t'engager dans une relation continue et précieuse.</p>`,
+            category: "social"
+        }
+    ],
+    seo: [
+        {
+            id: 300,
+            title: "SEO (Normal)",
+            subtitle: "Contenu structuré pour Google, fluide pour les humains",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">SEO (Normal)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Contenu structuré pour Google, fluide pour les humains</h2>
+                <p class="mb-4">Tu es un expert SEO spécialisé dans la rédaction de contenu optimisé pour les moteurs de recherche. Ton objectif : créer des articles ou pages web à la fois bien référencés et agréables à lire.</p>
+                <h3 class="font-semibold mb-2">Voici ce que tu dois produire :</h3>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li>Un titre principal (H1) accrocheur, incluant le mot-clé principal.</li>
+                    <li>Une introduction engageante, mentionnant le mot-clé principal et suscitant l'envie de lire.</li>
+                    <li>Des sous-titres clairs (H2, H3…) pour structurer logiquement le contenu.</li>
+                    <li>Une répartition naturelle du mot-clé principal + mots-clés secondaires (sans bourrage).</li>
+                    <li>Des paragraphes courts et faciles à lire, avec des listes à puces ou numérotées si utile.</li>
+                    <li>Une FAQ optimisée SEO, basée sur les questions courantes liées à la requête cible.</li>
+                    <li>Une conclusion claire résumant les points essentiels, avec éventuellement un appel à l'action.</li>
+                    <li>Un ton humain, pédagogique, avec des exemples pratiques et des explications simples.</li>
+                </ul>
+                <p class="mb-4">Ta rédaction doit satisfaire à la fois :</p>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li><strong>L'utilisateur :</strong> clarté, valeur, engagement</li>
+                    <li><strong>Google :</strong> structure, sémantique, pertinence</li>
+                </ul>
+                <p class="mb-4">Fournis un contenu 100 % original, optimisé pour la requête cible suivante :<br><em>[Indique ici le mot-clé principal ou la requête cible]</em></p>`,
+            category: "seo"
+        },
+        {
+            id: 301,
+            title: "SEO (Alternatif & Avancé)",
+            subtitle: "Longue traîne stratégique orientée intention de recherche",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">SEO (Alternatif & Avancé)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Longue traîne stratégique orientée intention de recherche</h2>
+                <p class="mb-4">Tu es un expert SEO et rédacteur web stratégique. Ta spécialité : transformer une intention de recherche en contenu utile, engageant, et parfaitement indexable.</p>
+                <p class="mb-4">Ton objectif est de créer un contenu longue traîne, pensé pour se positionner sur des requêtes précises à faible concurrence mais fort potentiel d'engagement.</p>
+                <h3 class="font-semibold mb-2">Tu vas :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Analyser l'intention de recherche</strong> :<br>→ <em>[INSÈRE ICI LA REQUÊTE CIBLE]</em></li>
+                    <li><strong>Déduire le type de contenu attendu</strong> :<br>
+                        Informatif ? Comparatif ? Guide étape par étape ? Liste ?<br>
+                        Quelle promesse doit être faite dès l'intro pour retenir l'attention ?</li>
+                    <li><strong>Créer une structure complète</strong> :<br>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>Introduction = besoin + promesse + aperçu de la solution</li>
+                            <li>Corps = H2/H3 selon le chemin mental du lecteur</li>
+                            <li>Conclusion = résumé + prochaine étape ou appel à l'action</li>
+                            <li>Bonus : FAQ optimisée + expressions synonymes et contextuelles</li>
+                        </ul>
+                    </li>
+                    <li><strong>Optimiser naturellement</strong> :<br>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>Mot-clé principal bien intégré</li>
+                            <li>Cooccurrences et mots-clés secondaires pertinents</li>
+                            <li>Maillage interne + idées de liens externes</li>
+                            <li>Méta-title et méta-description SEO friendly</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="mb-4">Tu rédiges un contenu long, utile, sincère, pédagogique, sans blabla inutile, pensé pour le lecteur avant tout.</p>`,
+            category: "seo"
+        },
+        {
+            id: 302,
+            title: "SEO (Ultra Ciblé – Positionnement Rapide)",
+            subtitle: "Contenu prêt à ranker vite sur des niches peu concurrentielles",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">SEO (Ultra Ciblé – Positionnement Rapide)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Contenu prêt à ranker vite sur des niches peu concurrentielles</h2>
+                <p class="mb-4">Tu es un rédacteur SEO hautement stratégique, formé à l'analyse d'opportunités de positionnement express. Ton rôle : produire un contenu prêt à ranker rapidement sur une requête de niche.</p>
+                <h3 class="font-semibold mb-2">Ta mission :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Analyse express de la requête</strong> :<br>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>Niveau de concurrence</li>
+                            <li>Type de contenu attendu (guide, astuce, comparatif...)</li>
+                            <li>Intention : informationnelle, transactionnelle, navigationnelle</li>
+                        </ul>
+                    </li>
+                    <li><strong>Création d'un contenu ciblé & rapide à lire</strong> :<br>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>H1 avec le mot-clé exact</li>
+                            <li>Introduction courte, orientée solution</li>
+                            <li>2 à 3 sections maximum (avec H2)</li>
+                            <li>Listes, tableaux, encadrés pratiques</li>
+                            <li>Mini FAQ optimisée (2 à 3 questions)</li>
+                            <li>Conclusion/action simple (contact, ressource complémentaire)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Optimisation précise</strong> :<br>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>Mot-clé dans : H1, intro, H2, alt, méta-title, méta-description</li>
+                            <li>Suggestion d'URL SEO friendly</li>
+                            <li>Maillage interne vers un contenu connexe</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="mb-4">Tu rédiges un contenu concis, stratégique, et fluide, conçu comme si Google et l'utilisateur le lisaient ensemble.</p>
+                <p class="mb-4">Requête à traiter : <em>[INSÈRE ICI LA REQUÊTE CIBLE]</em></p>`,
+            category: "seo"
+        }
+    ],
+    productivity: [
+        {
+            id: 400,
+            title: "Productivity (Pro+)",
+            subtitle: "Stratégies concrètes pour créateurs et indépendants",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Productivity (Pro+)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Stratégies concrètes pour créateurs et indépendants</h2>
+                <p class="mb-4">Tu es un expert en productivité humaine et stratégique, spécialisé dans l'accompagnement de créateurs, indépendants et entrepreneurs qui veulent produire mieux, plus vite, avec clarté – sans tomber dans les injonctions toxiques de "l'ultra-efficacité".</p>
+                <p class="mb-4">Ta mission est de créer un contenu applicable immédiatement, basé sur la psychologie, la simplicité et les actions concrètes à faible friction. Tu produis une ressource ultra pratique, détaillée, orientée clarté mentale et impact visible.</p>
+                <h3 class="font-semibold mb-2">Voici ce que tu vas produire :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Identifie une situation fréquente ou un blocage typique :</strong><br>
+                        Procrastination subtile, éparpillement mental, difficulté à terminer ce qu'il commence, confusion sur les priorités, motivation en dents de scie.</li>
+                    <li><strong>Explique le mécanisme invisible derrière ce blocage</strong>, avec des mots simples. Parle comme un mentor qui connaît parfaitement son lecteur. Pas de théorie inutile. Que du réel + vécu.</li>
+                    <li><strong>Propose une méthode d'action immédiate</strong> en 3 à 5 étapes : claire, faisable maintenant, qui libère de la charge mentale, augmente la lucidité, ou fait passer à l'action dès aujourd'hui.</li>
+                    <li><strong>Conclue en reformulant l'effet concret de cette micro-victoire</strong> et encourage le lecteur à "protéger son système" plutôt qu'à "forcer sa motivation".</li>
+                </ol>
+                <p class="mb-4">Ta structure est naturelle, en paragraphes courts. Pas d'intro théorique, pas de blabla. Juste : constat réel → explication → action → ancrage positif. Le ton est chaleureux, direct, profondément humain et pragmatique.</p>
+                <p class="mb-4">Rédige ce contenu pour une audience <em>[INSÈRE TON PUBLIC CIBLE ICI]</em>. Thématique à traiter : <em>[INSÈRE ICI LA THÉMATIQUE OU LE PROBLÈME DE PRODUCTIVITÉ]</em>.</p>`,
+            category: "productivity"
+        },
+        {
+            id: 401,
+            title: "Productivity (Ultra Structurel – Pro++)",
+            subtitle: "Construction de routines durables et productives",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Productivity (Ultra Structurel – Pro++)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Construction de routines durables et productives</h2>
+                <p class="mb-4">Tu es un architecte de systèmes personnels, expert en construction de routines mentales et physiques qui rendent la productivité durable, non toxique, et adaptée à la vraie vie.</p>
+                <p class="mb-4">Ton rôle est de produire un contenu ultra détaillé, orienté structure de travail, pour aider une personne à :</p>
+                <ul class="list-disc pl-5 mb-4">
+                    <li>Mieux organiser ses journées</li>
+                    <li>Créer un espace mental clair</li>
+                    <li>Maintenir son énergie sur ce qui compte</li>
+                    <li>Créer un effet cumulatif de résultats visibles</li>
+                </ul>
+                <h3 class="font-semibold mb-2">Voici ce que tu vas faire :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>Identifie un profil spécifique</strong> (ex : créateur solo, freelance, porteur de projet épuisé) et glisse-toi dans son quotidien.</li>
+                    <li><strong>Décris une situation réelle</strong> où sa productivité se casse discrètement la figure. Exemple concret et relatable.</li>
+                    <li><strong>Propose un modèle de structuration simple et adaptable :</strong><br>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>Matinée à impact</li>
+                            <li>Bloc d'énergie créative</li>
+                            <li>Routine de recalibrage mental</li>
+                            <li>Filtres de décisions (pour éviter les détours inutiles)</li>
+                            <li>Système d'ancrage (ramener à la priorité essentielle)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Donne une check-list immédiate à tester pendant 3 jours</strong>. Simple, réaliste, mais engageante. Ce qu'il ne faut pas faire aussi.</li>
+                    <li><strong>Conclue avec une idée de suivi</strong> : comment évaluer si le système fonctionne ? Quelle petite habitude conserver ?</li>
+                </ol>
+                <p class="mb-4">Ton style est calme, pro, humain, direct. Pas de motivation bullshit. Que du concret applicable, pensé pour la vraie vie.</p>
+                <p class="mb-4">Domaine ou cible à traiter : <em>[INSÈRE TON CONTEXTE / NICHE ICI]</em>. Problème de base : <em>[INSÈRE ICI CE QUE LA PERSONNE VIT ACTUELLEMENT]</em>.</p>`,
+            category: "productivity"
+        },
+        {
+            id: 402,
+            title: "Productivity (Pro+ / Version Courte & Directe)",
+            subtitle: "Solution simple pour une action immédiate",
+            text: `<h1 class="text-xl font-bold mb-2 prompt-title">Productivity (Pro+ / Version Courte & Directe)</h1>
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">Solution simple pour une action immédiate</h2>
+                <p class="mb-4">Tu es un stratège de productivité comportementale. Ta tâche : produire une action simple, ciblée, et immédiatement applicable qui augmente la clarté, réduit la fatigue décisionnelle, ou élimine une distraction cachée.</p>
+                <h3 class="font-semibold mb-2">Structure du contenu à produire :</h3>
+                <ol class="list-decimal pl-5 space-y-2 mb-4">
+                    <li><strong>1 constat précis et vécu par la cible</strong></li>
+                    <li><strong>1 micro-analyse de pourquoi ça coince</strong> (psychologie ou système)</li>
+                    <li><strong>1 solution directe, sans friction</strong>, à tester dans la journée</li>
+                    <li><strong>1 phrase de fermeture orientée répétition ou ancrage</strong></li>
+                </ol>
+                <p class="mb-4">Style : court, pro, sans détour. Ultra pertinent.</p>
+                <p class="mb-4">Cible : <em>[INSÈRE LE PROFIL : freelance, créateur, étudiant, etc.]</em>. Problème : <em>[INSÈRE LE BLOCAGE OU BESOIN : surcharge, désorganisation, dispersion, etc.]</em></p>`,
+            category: "productivity"
+        }
+    ]
+};
+            
+            // DOM elements
+            const categoryButtons = document.querySelectorAll('.category-card');
+            const promptsContainer = document.getElementById('prompts-container');
+            const contactBtn = document.getElementById('contact-btn');
+            const copiedNotification = document.getElementById('copied-notification');
+            const searchInput = document.getElementById('search-input');
+            const searchSuggestions = document.getElementById('search-suggestions');
+            let activeCategory = null;
+            let searchTimeout = null;
+
+            // Flatten all prompts for search
+            const allPrompts = Object.values(promptsData).flat();
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim().toLowerCase();
+                searchSuggestions.innerHTML = '';
+
+                if (query.length === 0) {
+                    searchSuggestions.style.display = 'none';
+                    return;
+                }
+
+                this.classList.add('loading');
+
+                searchTimeout = setTimeout(() => {
+                    this.classList.remove('loading');
+                    const results = allPrompts.filter(prompt => {
+                        const text = (prompt.title + ' ' + prompt.subtitle + ' ' + prompt.text.replace(/<[^>]*>/g, '')).toLowerCase();
+                        return text.includes(query);
+                    });
+
+                    if (results.length > 0) {
+                        results.slice(0, 5).forEach(prompt => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'search-suggestion';
+                            const title = highlightMatch(prompt.title, query);
+                            const subtitle = highlightMatch(prompt.subtitle, query);
+
+                            suggestion.innerHTML = `
+                                <div class="font-semibold">${title}</div>
+                                <div class="text-sm text-gray-400">${subtitle}</div>
+                            `;
+
+                            suggestion.addEventListener('click', () => {
+                                loadPrompts(prompt.category);
+                                scrollToPrompt(prompt.id);
+                                searchInput.value = '';
+                                searchSuggestions.style.display = 'none';
+                            });
+
+                            searchSuggestions.appendChild(suggestion);
+                        });
+                    } else {
+                        const noResults = document.createElement('div');
+                        noResults.className = 'no-results';
+                        noResults.textContent = 'Aucun résultat trouvé';
+                        searchSuggestions.appendChild(noResults);
+                    }
+
+                    searchSuggestions.style.display = 'block';
+                }, 500);
+            });
+
+            function highlightMatch(text, query) {
+                if (!query) return text;
+                const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+                return text.replace(regex, '<span class="search-highlight">$1</span>');
+            }
+
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                    searchSuggestions.style.display = 'none';
+                }
+            });
+
+            function scrollToPrompt(promptId) {
+                setTimeout(() => {
+                    const promptElement = document.querySelector(`[data-prompt-id="${promptId}"]`);
+                    if (promptElement) {
+                        promptElement.closest('.prompt-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        promptElement.closest('.prompt-card').style.animation = 'borderGlow 2s 3';
+                    }
+                }, 100);
+            }
+
+            function loadPrompts(category) {
+                categoryButtons.forEach(btn => {
+                    btn.classList.toggle('active-category', btn.dataset.category === category);
+                });
+
+                promptsContainer.innerHTML = '';
+
+                const prompts = promptsData[category] || [];
+
+                prompts.forEach((prompt, index) => {
+                    const promptElement = document.createElement('div');
+                    promptElement.className = `prompt-card bg-black bg-opacity-70 rounded-lg p-6 flex flex-col fade-in`;
+                    promptElement.style.animationDelay = `${index * 0.1}s`;
+
+                    promptElement.innerHTML = `
+                        <div class="prompt-content">
+                            ${prompt.text}
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-700">
+                            <button class="toggle-expand text-sm text-gray-300 hover:text-white">
+                                Voir plus <i data-lucide="chevron-down" class="w-4 h-4 inline"></i>
+                            </button>
+                            <div class="flex space-x-2">
+                                <button class="share-btn p-2 rounded-full hover:bg-gray-800" data-prompt-id="${prompt.id}">
+                                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                                </button>
+                                <button class="copy-btn p-2 rounded-full hover:bg-gray-800" data-prompt-text="${encodeURIComponent(prompt.text.replace(/<[^>]*>/g, ''))}">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="share-menu-${prompt.id}" class="share-menu absolute bottom-16 right-4 bg-black border border-white rounded-lg p-2 hidden">
+                            <div class="flex space-x-2">
+                                <button class="p-2 hover:bg-gray-800 rounded"><i data-lucide="facebook" class="w-4 h-4"></i></button>
+                                <button class="p-2 hover:bg-gray-800 rounded"><i data-lucide="instagram" class="w-4 h-4"></i></button>
+                                <button class="p-2 hover:bg-gray-800 rounded"><i data-lucide="linkedin" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    `;
+
+                    promptsContainer.appendChild(promptElement);
+                });
+
+                setTimeout(() => lucide.createIcons(), 100);
+                activeCategory = category;
+                addExpandListeners();
+            }
+
+            function addExpandListeners() {
+                document.querySelectorAll('.toggle-expand').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const promptContent = this.closest('.prompt-card').querySelector('.prompt-content');
+                        const isExpanded = promptContent.classList.toggle('expanded');
+                        
+                        this.innerHTML = isExpanded 
+                            ? 'Voir moins <i data-lucide="chevron-up" class="w-4 h-4 inline"></i>'
+                            : 'Voir plus <i data-lucide="chevron-down" class="w-4 h-4 inline"></i>';
+                        
+                        lucide.createIcons();
+                    });
+                });
+            }
+
+            // Category button event listeners
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    loadPrompts(button.dataset.category);
+                });
+            });
+
+            // Global click handlers
+            document.addEventListener('click', (e) => {
+                // Copy button handler
+                if (e.target.closest('.copy-btn')) {
+                    const copyBtn = e.target.closest('.copy-btn');
+                    const promptText = decodeURIComponent(copyBtn.dataset.promptText);
+
+                    navigator.clipboard.writeText(promptText).then(() => {
+                        copiedNotification.classList.remove('hidden');
+                        setTimeout(() => {
+                            copiedNotification.classList.add('hidden');
+                        }, 2000);
+                    });
+                }
+
+                // Share menu handlers
+                if (!e.target.closest('.share-btn') && !e.target.closest('.share-menu')) {
+                    document.querySelectorAll('.share-menu').forEach(menu => {
+                        menu.classList.add('hidden');
+                    });
+                }
+
+                if (e.target.closest('.share-btn')) {
+                    const shareBtn = e.target.closest('.share-btn');
+                    const promptId = shareBtn.dataset.promptId;
+                    const shareMenu = document.getElementById(`share-menu-${promptId}`);
+
+                    document.querySelectorAll('.share-menu').forEach(menu => {
+                        menu.classList.add('hidden');
+                    });
+
+                    shareMenu.classList.toggle('hidden');
+                }
+            });
+
+            // Load initial category
+            if (categoryButtons.length > 0) {
+                loadPrompts(categoryButtons[0].dataset.category);
+            }
+        });
+    </script>
+</body>
+</html>

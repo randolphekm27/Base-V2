@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script defer data-domain="base-v2.vercel.app" src="https://plausible.io/js/script.file-downloads.hash.outbound-links.revenue.js"></script>
-    <title>Base - Prompt Library</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <script defer data-domain="base-v2.vercel.app" src="https://plausible.io/js/script.file-downloads.hash.outbound-links.revenue.js"></script>
+  <title>Base - Prompt Library</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Favicon pour thème clair -->
+  <link rel="icon" type="image/png" href="/icon-dark.png" media="(prefers-color-scheme: light)" />
+  <!-- Favicon pour thème sombre -->
+  <link rel="icon" type="image/png" href="/icon-light.png" media="(prefers-color-scheme: dark)" />
+
+  <!-- Meta pour réseaux sociaux -->
+  <meta property="og:title" content="Base - Prompt Library" />
+  <meta property="og:description" content="Une bibliothèque de prompts IA pour libérer votre créativité." />
+  <meta property="og:image" content="https://base-v2.vercel.app/logo.png" />
+  <meta property="og:url" content="https://base-v2.vercel.app" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Base - Prompt Library" />
+  <meta name="twitter:description" content="Une bibliothèque de prompts IA pour libérer votre créativité." />
+  <meta name="twitter:image" content="https://base-v2.vercel.app/logo.png" />
     <style>
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -109,6 +130,15 @@
             animation: gradientBG 8s ease infinite;
             -webkit-tap-highlight-color: transparent;
         }
+        #logo {
+    transition: opacity 0.3s ease-in-out;
+    display: block;
+    margin: 0 auto;
+}
+
+body {
+    background-color: #000; /* Assure-toi que le fond est visible pour tester */
+}
         .gradient-btn:hover {
             transform: translateY(-2px);
         }
@@ -373,25 +403,22 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <!-- Brand Column -->
             <div class="space-y-4">
-                <div class="flex items-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white">
-                        <path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-2xl font-bold">Base</span>
-                </div>
-                <p class="text-white/60 text-sm">La bibliothèque ultime de prompts pour créateurs et professionnels du digital.</p>
-                <div class="flex space-x-4 pt-2">
-                    <a href="#" class="text-white/50 hover:text-white transition-colors">
-                        <i data-lucide="twitter" class="w-5 h-5"></i>
-                    </a>
-                    <a href="#" class="text-white/50 hover:text-white transition-colors">
-                        <i data-lucide="instagram" class="w-5 h-5"></i>
-                    </a>
-                    <a href="#" class="text-white/50 hover:text-white transition-colors">
-                        <i data-lucide="linkedin" class="w-5 h-5"></i>
-                    </a>
-                </div>
-            </div>
+    <div class="flex items-center justify-center">
+    <img id="logo" src="/logo-light.png" alt="Logo" class="w-[120px] h-[120px]">
+</div>
+    <p class="text-white/60 text-sm">La bibliothèque ultime de prompts pour créateurs et professionnels du digital.</p>
+    <div class="flex space-x-4 pt-2">
+        <a href="#" class="text-white/50 hover:text-white transition-colors">
+            <i data-lucide="twitter" class="w-5 h-5"></i>
+        </a>
+        <a href="#" class="text-white/50 hover:text-white transition-colors">
+            <i data-lucide="instagram" class="w-5 h-5"></i>
+        </a>
+        <a href="#" class="text-white/50 hover:text-white transition-colors">
+            <i data-lucide="linkedin" class="w-5 h-5"></i>
+        </a>
+    </div>
+</div>
 
             <!-- Quick Links -->
             <div>
@@ -1101,7 +1128,29 @@ seo: [
         likes: 58,
         shares: 23,
         date: '2025-05-10'
-    }
+    },
+    {
+    id: 'seo-303',
+    category: 'seo',
+    title: "Requêteur Google Maps PRO+ (multi-clients ciblés)",
+    subtitle: "Génère une URL Google Maps pour cibler toutes les entités d’un secteur dans un pays",
+    text: `<h1 class="text-xl font-bold mb-2 prompt-title">Requêteur Google Maps PRO+ (multi-clients ciblés)</h1>
+        <h2 class="text-lg font-semibold mb-4 text-gray-300">Génère une URL Google Maps pour cibler toutes les entités d’un secteur dans un pays</h2>
+        <p class="mb-4">Tu es un requêteur Google Maps PRO+.</p>
+        <p class="mb-4">Ton rôle est de générer un lien Google Maps précis, capable de ressortir toutes les entités commerciales ou professionnelles actives dans une niche spécifique dans un pays donné.</p>
+        <p class="mb-4">L’auteur t’indique deux éléments :</p>
+        <ol class="list-decimal pl-5 space-y-2 mb-4">
+            <li>Le domaine ou secteur d’activité ciblé (ex : graphiste freelance, studio design, avocat, agence immobilière, etc.)</li>
+            <li>Le pays où se trouvent ces entités</li>
+        </ol>
+        <p class="mb-4">Tu génères alors une seule et unique requête sous forme d’URL Google Maps. Cette URL doit ouvrir une page contenant plusieurs résultats, et non un seul point précis.</p>
+        <p class="mb-4">La requête est construite de façon à maximiser la visibilité de toutes les entités concernées dans tout le pays, même en l’absence de ville précisée.</p>
+        <p class="mb-4"><strong>Tu ne donnes aucun commentaire.</strong> Tu n’ajoutes rien d’autre que la requête finale.</p>
+        <p class="mb-4">Lorsque l’auteur te donne une niche et un pays, tu ne réponds que par le lien généré.</p>`,
+    likes: 0,
+    shares: 0,
+    date: '2025-05-11'
+},
 ],
 productivity: [
     {
@@ -1524,6 +1573,25 @@ shareModal.addEventListener('click', (e) => {
         closeShareModal();
     }
 });
+
+function updateLogoBasedOnBackground() {
+    const background = document.body.style.backgroundColor || window.getComputedStyle(document.body).backgroundColor;
+    const logo = document.getElementById('logo');
+    
+    // Analyse la couleur du fond pour déterminer si elle est claire ou sombre
+    const rgb = background.match(/\d+/g); // Récupère les valeurs RGB
+    if (rgb) {
+        const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+        if (brightness > 128) { // Si l'arrière-plan est clair
+            logo.src = '/logo-dark.png';
+        } else { // Si l'arrière-plan est sombre
+            logo.src = '/logo-light.png';
+        }
+    }
+}
+
+// Appelle la fonction lors du chargement de la page
+window.onload = updateLogoBasedOnBackground;
 
 function checkUrlForPrompt() {
     const urlParams = new URLSearchParams(window.location.search);
